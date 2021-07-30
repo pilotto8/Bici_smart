@@ -10,6 +10,7 @@ void loop() {
     analogWrite(6, i);
     delay(10);
   }
+  delay(10000);
   for(int i = 0; i < max_power; i++){
     analogWrite(6, max_power - i);
     delay(10);
