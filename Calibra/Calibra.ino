@@ -2,17 +2,15 @@
 void setup()
 {
   Wire.begin();
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
   digitalWrite(intPin, LOW);
-  mpu.writeByte(MPU6050_ADDRESS, PWR_MGMT_1, 0b00000000);
   Serial.println(mpu.readByte(MPU6050_ADDRESS, 0x6b), BIN);
   #if CAL
     MPUcalibration();
   #endif
-  attachInterrupt(digitalPinToInterrupt(intPin), wakeUp, RISING);
 }
 
 void loop()
