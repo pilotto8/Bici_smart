@@ -8,6 +8,7 @@ volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has g
 void dmpDataReady()
 {
   mpuInterrupt = true;
+  digitalWrite(LED_PIN, 1);
 }
 
 // ================================================================
@@ -27,37 +28,9 @@ void setup()
   pinMode(INTERRUPT_PIN, INPUT);
   pinMode(LED_PIN, OUTPUT);
   pinMode(3, INPUT_PULLUP);
-
   MPUsetUp();
-  /*mpu.setSleepEnabled(false);
-    mpu.setClockSource(MPU6050_CLOCK_INTERNAL);
-    mpu.setRate(4);
-    mpu.setDLPFMode(MPU6050_DLPF_BW_42);
-    mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-    mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-    mpu.setDMPConfig1(0x03);
-    mpu.setDMPConfig2(0x00);
-    mpu.setFIFOEnabled(true);
-    mpu.resetDMP();
-	  //mpu.setDMPEnabled(false);
-	  mpu.resetFIFO();
-	  mpu.getIntStatus();*/
-
-  // supply your own gyro offsets here, scaled for min sensitivity
-  //mpu.setXGyroOffset(220);
-  //mpu.setYGyroOffset(76);
-  //mpu.setZGyroOffset(-85);
-  //mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
-
-  // Calibration Time: generate offsets and calibrate our MPU6050
-  //mpu.CalibrateAccel(6);
-  //mpu.CalibrateGyro(6);
-  //mpu.PrintActiveOffsets();
   mpu.setDMPEnabled(true);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-  mpuIntStatus = mpu.getIntStatus();
-  dmpReady = true;
-  packetSize = mpu.dmpGetFIFOPacketSize();
 
   MPUsetInt();
   mpu.setIntMotionEnabled(1);
@@ -78,17 +51,20 @@ void setup()
 
 void loop()
 {
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  Serial.print(ax);
+  Serial.print(", ");
+  Serial.print(ay);
+  Serial.print(", ");
+  Serial.print(az);
+  Serial.println("");
   if (mpuInterrupt)
   {
     mpuInterrupt = false;
-    digitalWrite(LED_PIN, 1);
+    
     if (mpu.getIntMotionStatus())
     {
       Serial.println("Bummmm");
-    }
-    else if (mpu.getIntZeroMotionStatus())
-    {
-      Serial.println("Shallissimo");
     }
   }
   else
@@ -98,8 +74,9 @@ void loop()
 
   if (!digitalRead(3))
   {
+    mpu.setIntMotionEnabled(0);
     delay(1000);
-    //MPUsetUp();
+    MPUsetUp();
     MPUsetInt();
     mpu.setIntMotionEnabled(1);
   }

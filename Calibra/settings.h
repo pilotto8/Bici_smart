@@ -1,7 +1,7 @@
 #include <avr/sleep.h>
 #include <Wire.h>
 #include "MPU6050.h"
-#define CAL 0
+#define CAL 1
 #define max_power 250
 
 #define intPin 2

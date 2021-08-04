@@ -1,13 +1,14 @@
 void MPUsetUp(){
 	mpu.reset();
 	delay(30);
-	mpu.setSleepEnabled(false);
+	mpu.setSleepEnabled(0);
+    mpu.setTempSensorEnabled(0);
 
 	// get MPU hardware revision
 	mpu.setMemoryStartAddress(0x06);
 	mpu.setMemoryBank(0, false, false);
 
-	mpu.setClockSource(MPU6050_CLOCK_INTERNAL);
+	mpu.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 	mpu.setRate(4); // 1khz / (1 + 4) = 200 Hz
     mpu.setDLPFMode(MPU6050_DLPF_BW_42);
     mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
@@ -39,6 +40,8 @@ void MPUsetUp(){
 	DEBUG_PRINTLN(F("Resetting FIFO and clearing INT status one last time..."));
 	mpu.resetFIFO();
 	mpu.getIntStatus();
+
+    //mpu.setWakeCycleEnabled(1);
 }
 
 void MPUsetInt(){
