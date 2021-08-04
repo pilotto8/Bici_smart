@@ -5,15 +5,13 @@
 // ================================================================
 
 volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
-void dmpDataReady()
+void hey()
 {
-  mpuInterrupt = true;
-  digitalWrite(LED_PIN, 1);
+  if (mpu.getIntMotionStatus()){
+    phase = checking;
+  }
 }
 
-// ================================================================
-// ===                      INITIAL SETUP                       ===
-// ================================================================
 
 void setup()
 {
@@ -30,7 +28,7 @@ void setup()
   pinMode(3, INPUT_PULLUP);
   MPUsetUp();
   mpu.setDMPEnabled(true);
-  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+  LowPower.attachInterruptWakeup(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
 
   MPUsetInt();
   mpu.setIntMotionEnabled(1);
@@ -45,31 +43,44 @@ void setup()
   //Serial.println(mpu.getIntDMPEnabled());
 }
 
-// ================================================================
-// ===                    MAIN PROGRAM LOOP                     ===
-// ================================================================
-
 void loop()
 {
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  Serial.print(ax);
-  Serial.print(", ");
-  Serial.print(ay);
-  Serial.print(", ");
-  Serial.print(az);
-  Serial.println("");
-  if (mpuInterrupt)
-  {
-    mpuInterrupt = false;
-    
-    if (mpu.getIntMotionStatus())
-    {
-      Serial.println("Bummmm");
+  switch (phase){
+    case sleeping:{
+      if (phase != loaded_phase){
+        phase = loaded_phase;
+        MPUsetUp();
+        MPUsetInt();
+        mpu.setIntMotionEnabled(1);
+      }
+      LowPower.deepSleep();
+      break;
     }
-  }
-  else
-  {
-    digitalWrite(LED_PIN, 0);
+    case checking:{
+      
+      if (phase != loaded_phase){
+        phase = loaded_phase;
+        mpu.setIntMotionEnabled(0);
+      }
+      MPUgetNoise();
+      break;
+    }
+    case mooving:{
+      if (phase != loaded_phase){
+        phase = loaded_phase;
+      }
+      if (millis() - millisCounter > 10){
+        millisCounter = millis() / 10 * 10;
+        mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+        Serial.print(ax);
+        Serial.print(", ");
+        Serial.print(ay);
+        Serial.print(", ");
+        Serial.print(az);
+        Serial.println("");
+      }
+      break;
+    }
   }
 
   if (!digitalRead(3))

@@ -41,7 +41,8 @@ void MPUsetUp(){
 	mpu.resetFIFO();
 	mpu.getIntStatus();
 
-    //mpu.setWakeCycleEnabled(1);
+	//mpu.setWakeFrequency(1);
+    //mpu.setWakeCycleEnabled(2);
 }
 
 void MPUsetInt(){
@@ -50,10 +51,37 @@ void MPUsetInt(){
     mpu.setMotionDetectionThreshold(2);
     mpu.setMotionDetectionDuration(1);
     mpu.setMotionDetectionCounterDecrement(3);
-
-    mpu.setZeroMotionDetectionThreshold(1);
-    mpu.setZeroMotionDetectionDuration(1);
     
     mpu.setInterruptLatch(1);
     mpu.setInterruptLatchClear(0);
+}
+
+int MPUgetNoise(){
+    if (millis() - millisCounter > 10){
+      millisCounter = millis() / 10 * 10;
+      pax = ax;
+      pay = ay;
+      paz = az;
+      mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+      max_noise = 0;
+      if (abs(ax - pax) > max_noise){
+        max_noise = abs(ax - pax);
+      }
+      if (abs(ay - pay) > max_noise){
+        max_noise = abs(ay - pay);
+      }
+      if (abs(az - paz) > max_noise){
+        max_noise = abs(az - paz);
+      }
+      average_noise *= 100;
+      average_noise -= noise[noise_index];
+      noise[noise_index] = max_noise;
+      average_noise += noise[noise_index];
+      average_noise /= 100;
+      noise[noise_index] = (noise_index + 1) % 100;
+	  Serial.print(average_noise);
+	  Serial.print(", ");
+	  Serial.println(max_noise);
+	}
+	return average_noise;
 }
