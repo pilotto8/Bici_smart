@@ -7,7 +7,6 @@ void setup()
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
   digitalWrite(intPin, LOW);
-  Serial.println(mpu.readByte(MPU6050_ADDRESS, 0x6b), BIN);
   #if CAL
     MPUcalibration();
   #endif
