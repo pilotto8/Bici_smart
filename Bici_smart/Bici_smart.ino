@@ -24,7 +24,9 @@ void setup()
   pinMode(INTERRUPT_PIN, INPUT);
   pinMode(FRONT_LED_PIN, OUTPUT);
   pinMode(REAR_LED_PIN, OUTPUT);
+  pinMode(13, OUTPUT);
   pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
   MPUsetUp();
   mpu.setDMPEnabled(true);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
@@ -32,6 +34,11 @@ void setup()
 
   MPUsetInt();
   //mpu.setIntMotionEnabled(1);
+
+  for (int i = 0; i < 2; i++){
+    LED_mode[i] = EEPROM.read(i);
+    Serial.println(LED_mode[i]);
+  }
 }
 
 void loop()
@@ -43,8 +50,11 @@ void loop()
         MPUsetUp();
         MPUsetInt();
         mpu.setIntMotionEnabled(1);
+        digitalWrite(13, 0);
         Serial.println("Going to sleep...");
-        set_sleep_mode(SLEEP_MODE_PWR_OFF);
+      }
+      if (!changing){
+        set_sleep_mode(SLEEP_MODE_PWR_SAVE);
         sleep_enable(); 
         sleep_mode();
         sleep_disable();
@@ -69,11 +79,14 @@ void loop()
     case mooving:{
       if (phase != loaded_phase){
         loaded_phase = phase;
+        setLEDstate(1);
         millisCheckpoint = millis();
+        digitalWrite(13, 1);
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){
-        if (millis() - millisCheckpoint > 5000){
+        if (millis() - millisCheckpoint > 20000){
+          setLEDstate(0);
           phase = sleeping;
         }
       }
@@ -84,10 +97,15 @@ void loop()
     }
   }
   LEDhandle();
-
-  if (!digitalRead(3))
-  {
-    phase = sleeping;
-    delay(1000);
+  if (!digitalRead(3)) {
+    LED_mode[0] = (LED_mode[0] + 1) % 4;
+    Serial.println("Front +");
   }
+  while (!digitalRead(3)){}
+
+  if (!digitalRead(4)) {
+    LED_mode[1] = (LED_mode[1] + 1) % 4;
+    Serial.println("Rear +");
+  }
+  while (!digitalRead(4)){}
 }

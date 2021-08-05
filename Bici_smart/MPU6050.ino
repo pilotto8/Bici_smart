@@ -55,12 +55,14 @@ void MPUsetInt(){
     mpu.setInterruptLatch(0);
     mpu.setInterruptLatchClear(0);
 
+	#if DEBUG
 	Serial.println("Motion detection:");
     Serial.println(mpu.getMotionDetectionThreshold());
     Serial.println(mpu.getMotionDetectionDuration());
     Serial.println(mpu.getMotionDetectionCounterDecrement());
     Serial.println(mpu.getIntMotionEnabled());
     Serial.println(mpu.getIntEnabled(), BIN);
+	#endif
 }
 
 float MPUgetNoise(){

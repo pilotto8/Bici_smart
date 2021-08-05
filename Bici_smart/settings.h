@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
+#include <EEPROM.h>
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -47,8 +48,8 @@ unsigned long int millisCheckpoint;
 #define MAX_FRONT_LED_POWER 250
 #define MAX_REAR_LED_POWER 1024
 #define LED_TRANSITION_TIME 100
-#define FRONT_LED_COEFF = LED_TRANSITION_TIME / MAX_FRONT_LED_POWER
-#define REAR_LED_COEFF = LED_TRANSITION_TIME / MAX_REAR_LED_POWER
+const float FRONT_LED_COEFF = LED_TRANSITION_TIME / MAX_FRONT_LED_POWER;
+const float REAR_LED_COEFF = LED_TRANSITION_TIME / MAX_REAR_LED_POWER;
 float LED_power[2];
 unsigned int LED_power_target[2];
 unsigned int LED_blink[2];
@@ -62,5 +63,4 @@ static const unsigned int mode_map[4][4] PROGMEM = {
 byte LED_mode[2];
 byte loaded_LED_mode[2];
 
-LED_configurations LED_state[3];
-bool forced;
+bool changing;
