@@ -22,7 +22,8 @@ void setup()
 
   Serial.begin(115200);
   pinMode(INTERRUPT_PIN, INPUT);
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(FRONT_LED_PIN, OUTPUT);
+  pinMode(REAR_LED_PIN, OUTPUT);
   pinMode(3, INPUT_PULLUP);
   MPUsetUp();
   mpu.setDMPEnabled(true);
@@ -30,16 +31,7 @@ void setup()
   //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   MPUsetInt();
-  mpu.setIntMotionEnabled(1);
-
-  /*Serial.println("Motion detection:");
-    Serial.println(mpu.getMotionDetectionThreshold());
-    Serial.println(mpu.getMotionDetectionDuration());
-    Serial.println(mpu.getMotionDetectionCounterDecrement());
-    Serial.println(mpu.getIntMotionEnabled());
-    Serial.println(mpu.getIntEnabled(), BIN);
-    Serial.println(mpu.getDMPEnabled());*/
-  //Serial.println(mpu.getIntDMPEnabled());
+  //mpu.setIntMotionEnabled(1);
 }
 
 void loop()
@@ -52,7 +44,7 @@ void loop()
         MPUsetInt();
         mpu.setIntMotionEnabled(1);
         Serial.println("Going to sleep...");
-        set_sleep_mode(SLEEP_MODE_IDLE);
+        set_sleep_mode(SLEEP_MODE_PWR_OFF);
         sleep_enable(); 
         sleep_mode();
         sleep_disable();
@@ -66,7 +58,7 @@ void loop()
         millisCheckpoint = millis();
         Serial.println("Checking?");
       }
-      if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > 1000){ 
+      if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > NOISE_LENGTH * NOISE_SAMPLING_DELAY){ 
         phase = sleeping;
       }
       else if (millis() - millisCheckpoint > 2000){
@@ -77,16 +69,25 @@ void loop()
     case mooving:{
       if (phase != loaded_phase){
         loaded_phase = phase;
+        millisCheckpoint = millis();
         Serial.println("Mooving!");
       }
-      MPUgetNoise();
+      if (MPUgetNoise() < NOISE_TRESHOLD){
+        if (millis() - millisCheckpoint > 5000){
+          phase = sleeping;
+        }
+      }
+      else {
+        millisCheckpoint = millis();
+      }
       break;
     }
   }
+  LEDhandle();
 
   if (!digitalRead(3))
   {
     phase = sleeping;
-    delay(1000  );
+    delay(1000);
   }
 }

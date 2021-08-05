@@ -48,17 +48,24 @@ void MPUsetUp(){
 void MPUsetInt(){
     I2Cdev::writeByte(0x68, MPU6050_RA_INT_ENABLE, 0);
     
-    mpu.setMotionDetectionThreshold(2);
+    mpu.setMotionDetectionThreshold(15);
     mpu.setMotionDetectionDuration(1);
     mpu.setMotionDetectionCounterDecrement(3);
     
     mpu.setInterruptLatch(0);
     mpu.setInterruptLatchClear(0);
+
+	Serial.println("Motion detection:");
+    Serial.println(mpu.getMotionDetectionThreshold());
+    Serial.println(mpu.getMotionDetectionDuration());
+    Serial.println(mpu.getMotionDetectionCounterDecrement());
+    Serial.println(mpu.getIntMotionEnabled());
+    Serial.println(mpu.getIntEnabled(), BIN);
 }
 
 float MPUgetNoise(){
-    if (millis() - millisCounter > 10){
-      millisCounter = millis() / 10 * 10;
+    if (millis() - noiseMillisCounter > NOISE_SAMPLING_DELAY){
+      noiseMillisCounter = millis() / 10 * 10;
       pax = ax;
       pay = ay;
       paz = az;
@@ -79,9 +86,11 @@ float MPUgetNoise(){
       average_noise += noise[noise_index];
 	  average_noise /= NOISE_LENGTH;
       noise_index = (noise_index + 1) % NOISE_LENGTH;
-	  Serial.print(average_noise);
-	  Serial.print(", ");
-	  Serial.println(max_noise / 10);
+	  #if DEBUG
+	  	Serial.print(average_noise);
+	  	Serial.print(", ");
+	  	Serial.println(max_noise / 10);
+	  #endif
 	}
 	return average_noise;
 }
