@@ -7,9 +7,7 @@
 volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
 void hey()
 {
-  if (mpu.getIntMotionStatus()){
-    phase = checking;
-  }
+  phase = checking;
 }
 
 
@@ -28,7 +26,8 @@ void setup()
   pinMode(3, INPUT_PULLUP);
   MPUsetUp();
   mpu.setDMPEnabled(true);
-  LowPower.attachInterruptWakeup(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
+  //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   MPUsetInt();
   mpu.setIntMotionEnabled(1);
@@ -48,47 +47,46 @@ void loop()
   switch (phase){
     case sleeping:{
       if (phase != loaded_phase){
-        phase = loaded_phase;
+        loaded_phase = phase;
         MPUsetUp();
         MPUsetInt();
         mpu.setIntMotionEnabled(1);
+        Serial.println("Going to sleep...");
+        set_sleep_mode(SLEEP_MODE_IDLE);
+        sleep_enable(); 
+        sleep_mode();
+        sleep_disable();
       }
-      LowPower.deepSleep();
       break;
     }
     case checking:{
-      
       if (phase != loaded_phase){
-        phase = loaded_phase;
+        loaded_phase = phase;
         mpu.setIntMotionEnabled(0);
+        millisCheckpoint = millis();
+        Serial.println("Checking?");
       }
-      MPUgetNoise();
+      if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > 1000){ 
+        phase = sleeping;
+      }
+      else if (millis() - millisCheckpoint > 2000){
+        phase = mooving;
+      }
       break;
     }
     case mooving:{
       if (phase != loaded_phase){
-        phase = loaded_phase;
+        loaded_phase = phase;
+        Serial.println("Mooving!");
       }
-      if (millis() - millisCounter > 10){
-        millisCounter = millis() / 10 * 10;
-        mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-        Serial.print(ax);
-        Serial.print(", ");
-        Serial.print(ay);
-        Serial.print(", ");
-        Serial.print(az);
-        Serial.println("");
-      }
+      MPUgetNoise();
       break;
     }
   }
 
   if (!digitalRead(3))
   {
-    mpu.setIntMotionEnabled(0);
-    delay(1000);
-    MPUsetUp();
-    MPUsetInt();
-    mpu.setIntMotionEnabled(1);
+    phase = sleeping;
+    delay(1000  );
   }
 }

@@ -52,11 +52,11 @@ void MPUsetInt(){
     mpu.setMotionDetectionDuration(1);
     mpu.setMotionDetectionCounterDecrement(3);
     
-    mpu.setInterruptLatch(1);
+    mpu.setInterruptLatch(0);
     mpu.setInterruptLatchClear(0);
 }
 
-int MPUgetNoise(){
+float MPUgetNoise(){
     if (millis() - millisCounter > 10){
       millisCounter = millis() / 10 * 10;
       pax = ax;
@@ -73,15 +73,15 @@ int MPUgetNoise(){
       if (abs(az - paz) > max_noise){
         max_noise = abs(az - paz);
       }
-      average_noise *= 100;
+      average_noise *= NOISE_LENGTH;
       average_noise -= noise[noise_index];
-      noise[noise_index] = max_noise;
+      noise[noise_index] = max_noise / 10;
       average_noise += noise[noise_index];
-      average_noise /= 100;
-      noise[noise_index] = (noise_index + 1) % 100;
+	  average_noise /= NOISE_LENGTH;
+      noise_index = (noise_index + 1) % NOISE_LENGTH;
 	  Serial.print(average_noise);
 	  Serial.print(", ");
-	  Serial.println(max_noise);
+	  Serial.println(max_noise / 10);
 	}
 	return average_noise;
 }
