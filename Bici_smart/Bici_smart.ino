@@ -50,10 +50,10 @@ void loop()
         MPUsetUp();
         MPUsetInt();
         mpu.setIntMotionEnabled(1);
-        digitalWrite(13, 0);
         Serial.println("Going to sleep...");
       }
       if (!changing){
+        digitalWrite(13, 0);
         set_sleep_mode(SLEEP_MODE_PWR_SAVE);
         sleep_enable(); 
         sleep_mode();
@@ -99,13 +99,15 @@ void loop()
   LEDhandle();
   if (!digitalRead(3)) {
     LED_mode[0] = (LED_mode[0] + 1) % 4;
-    Serial.println("Front +");
+    Serial.print("Front: ");
+    Serial.println(LED_mode[0]);
   }
   while (!digitalRead(3)){}
 
   if (!digitalRead(4)) {
     LED_mode[1] = (LED_mode[1] + 1) % 4;
-    Serial.println("Rear +");
+    Serial.print("Rear: ");
+    Serial.println(LED_mode[1]);
   }
   while (!digitalRead(4)){}
 }

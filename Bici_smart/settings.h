@@ -13,8 +13,8 @@ MPU6050 mpu;
 
 // Pin definitions
 #define INTERRUPT_PIN 2
-#define FRONT_LED_PIN 6
-#define REAR_LED_PIN 7
+#define FRONT_LED_PIN 5
+#define REAR_LED_PIN 6
 
 
 // MPU values
@@ -45,20 +45,26 @@ unsigned long int LEDmillisCounter;
 unsigned long int millisCheckpoint;
 
 // LEDs
-#define MAX_FRONT_LED_POWER 250
-#define MAX_REAR_LED_POWER 1024
-#define LED_TRANSITION_TIME 100
-const float FRONT_LED_COEFF = LED_TRANSITION_TIME / MAX_FRONT_LED_POWER;
-const float REAR_LED_COEFF = LED_TRANSITION_TIME / MAX_REAR_LED_POWER;
+#define MAX_FRONT_LED_POWER 250.0
+#define MAX_REAR_LED_POWER 1024.0
+#define LED_TRANSITION_TIME 100.0
+const float FRONT_LED_COEFF =  MAX_FRONT_LED_POWER / LED_TRANSITION_TIME;
+const float REAR_LED_COEFF = MAX_REAR_LED_POWER / LED_TRANSITION_TIME;
+#if FRONT_LED_COEFF > REAR_LED_COEFF
+#define MIN_STEP REAR_LED_COEFF
+#else
+#define MIN_STEP FRONT_LED_COEFF
+#endif
+
 float LED_power[2];
-unsigned int LED_power_target[2];
+float LED_power_target[2];
 unsigned int LED_blink[2];
 unsigned int blink[2];
-static const unsigned int mode_map[4][4] PROGMEM = {
-    {0, MAX_FRONT_LED_POWER, MAX_FRONT_LED_POWER / 2, MAX_FRONT_LED_POWER},
-    {0, 0, 0, 500},
-    {0, MAX_REAR_LED_POWER, MAX_REAR_LED_POWER / 2, MAX_REAR_LED_POWER},
-    {0, 0, 0, 500}
+const float mode_map[4][4] = {
+    {0.0, MAX_FRONT_LED_POWER, MAX_FRONT_LED_POWER / 10.0, MAX_FRONT_LED_POWER},
+    {0.0, 0.0, 0.0, 50.0},
+    {0.0, MAX_REAR_LED_POWER, MAX_REAR_LED_POWER / 10.0, MAX_REAR_LED_POWER},
+    {0.0, 0.0, 0.0, 50.0}
 };
 byte LED_mode[2];
 byte loaded_LED_mode[2];
