@@ -54,6 +54,8 @@ void loop()
       }
       if (!changing){
         digitalWrite(13, 0);
+        analogWrite(FRONT_LED_PIN, 0);
+        analogWrite(REAR_LED_PIN, 0);
         set_sleep_mode(SLEEP_MODE_PWR_SAVE);
         sleep_enable(); 
         sleep_mode();
@@ -85,7 +87,7 @@ void loop()
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){
-        if (millis() - millisCheckpoint > 20000){
+        if (millis() - millisCheckpoint > 200000){
           setLEDstate(0);
           phase = sleeping;
         }
@@ -96,9 +98,16 @@ void loop()
       break;
     }
   }
-  LEDhandle();
+  if (millis() - millisCounter > 10 || change){
+      millisCounter = millis() / 10 * 10;
+      //PHcalibrate();
+      PHget();
+      LEDhandle();
+  }
+  
   if (!digitalRead(3)) {
     LED_mode[0] = (LED_mode[0] + 1) % 4;
+    phase = mooving;
     Serial.print("Front: ");
     Serial.println(LED_mode[0]);
   }
@@ -106,6 +115,7 @@ void loop()
 
   if (!digitalRead(4)) {
     LED_mode[1] = (LED_mode[1] + 1) % 4;
+    phase = mooving;
     Serial.print("Rear: ");
     Serial.println(LED_mode[1]);
   }

@@ -71,7 +71,7 @@ float MPUgetNoise(){
       pax = ax;
       pay = ay;
       paz = az;
-      mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+      mpu.getAcceleration(&ax, &ay, &az);
       max_noise = 0;
       if (abs(ax - pax) > max_noise){
         max_noise = abs(ax - pax);

@@ -41,11 +41,12 @@ byte loaded_phase;
 
 // Timer
 unsigned long int noiseMillisCounter;
-unsigned long int LEDmillisCounter;
+unsigned long int millisCounter;
+byte check_PH; 
 unsigned long int millisCheckpoint;
 
 // LEDs
-#define MAX_FRONT_LED_POWER 250.0
+#define MAX_FRONT_LED_POWER 200.0
 #define MAX_REAR_LED_POWER 1024.0
 #define LED_TRANSITION_TIME 100.0
 const float FRONT_LED_COEFF =  MAX_FRONT_LED_POWER / LED_TRANSITION_TIME;
@@ -70,3 +71,17 @@ byte LED_mode[2];
 byte loaded_LED_mode[2];
 
 bool changing;
+bool change;
+
+// Photoresistors
+#define PH_CONTRAST_TRESTHOLD 10
+int PH_value[2];
+unsigned int PH_difference[10];
+unsigned int PH_difference_average;
+int PH_calibration[32] = {
+    10, 15, 18, 27, 38, 45, 57, 66, 74, 82, 
+    89, 95, 102, 106, 112, 116, 120, 122, 125, 127, 
+    126, 126, 118, 121, 117, 120, 104, 83, 84, 85, 
+    75, 57};
+bool PH_calibration_done[32];
+bool skip_calibration;
