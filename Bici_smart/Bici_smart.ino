@@ -24,7 +24,7 @@ void setup()
   pinMode(INTERRUPT_PIN, INPUT);
   pinMode(FRONT_LED_PIN, OUTPUT);
   pinMode(REAR_LED_PIN, OUTPUT);
-  pinMode(13, OUTPUT);
+  //pinMode(13, OUTPUT);
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
   MPUsetUp();
@@ -53,7 +53,7 @@ void loop()
         Serial.println("Going to sleep...");
       }
       if (!changing){
-        digitalWrite(13, 0);
+        //digitalWrite(13, 0);
         analogWrite(FRONT_LED_PIN, 0);
         analogWrite(REAR_LED_PIN, 0);
         set_sleep_mode(SLEEP_MODE_PWR_SAVE);
@@ -83,7 +83,7 @@ void loop()
         loaded_phase = phase;
         setLEDstate(1);
         millisCheckpoint = millis();
-        digitalWrite(13, 1);
+        //digitalWrite(13, 1);
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){

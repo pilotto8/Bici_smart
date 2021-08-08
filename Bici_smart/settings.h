@@ -74,6 +74,9 @@ bool changing;
 bool change;
 
 // Photoresistors
+#define PH0 A0
+#define PH1 A1
+#define PH_SAMPLING_TIME 10
 #define PH_CONTRAST_TRESTHOLD 10
 int PH_value[2];
 unsigned int PH_difference[10];
