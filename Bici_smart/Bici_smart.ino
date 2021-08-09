@@ -25,8 +25,8 @@ void setup()
   pinMode(FRONT_LED_PIN, OUTPUT);
   pinMode(REAR_LED_PIN, OUTPUT);
   //pinMode(13, OUTPUT);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
+  pinMode(B0, INPUT_PULLUP);
+  pinMode(B1, INPUT_PULLUP);
   MPUsetUp();
   mpu.setDMPEnabled(true);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
@@ -53,10 +53,9 @@ void loop()
         Serial.println("Going to sleep...");
       }
       if (!changing){
-        //digitalWrite(13, 0);
         analogWrite(FRONT_LED_PIN, 0);
         analogWrite(REAR_LED_PIN, 0);
-        set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
         sleep_enable(); 
         sleep_mode();
         sleep_disable();
@@ -83,7 +82,6 @@ void loop()
         loaded_phase = phase;
         setLEDstate(1);
         millisCheckpoint = millis();
-        //digitalWrite(13, 1);
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){
@@ -98,26 +96,10 @@ void loop()
       break;
     }
   }
+
   if (millis() - millisCounter > 10 || change){
       millisCounter = millis() / 10 * 10;
-      //PHcalibrate();
-      PHget();
       LEDhandle();
   }
-  
-  if (!digitalRead(3)) {
-    LED_mode[0] = (LED_mode[0] + 1) % 4;
-    phase = mooving;
-    Serial.print("Front: ");
-    Serial.println(LED_mode[0]);
-  }
-  while (!digitalRead(3)){}
-
-  if (!digitalRead(4)) {
-    LED_mode[1] = (LED_mode[1] + 1) % 4;
-    phase = mooving;
-    Serial.print("Rear: ");
-    Serial.println(LED_mode[1]);
-  }
-  while (!digitalRead(4)){}
+  buttons();
 }

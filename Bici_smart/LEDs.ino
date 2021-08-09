@@ -1,15 +1,18 @@
 void setLEDstate(bool state){
-    if (state){
-        for (int i = 0; i < 2; i++){
-            LED_power_target[i] = mode_map[i * 2][LED_mode[i]];
+    if (state != LED_state){
+        if (state){
+            for (int i = 0; i < 2; i++){
+                LED_power_target[i] = mode_map[i * 2][LED_mode[i]];
+            }
         }
-    }
-    else {
-        for (int i = 0; i < 2; i++){
-            LED_power_target[i] = 0;
+        else {
+            for (int i = 0; i < 2; i++){
+                LED_power_target[i] = 0;
+            }
         }
+        LED_state = state;
+        change = 1;
     }
-    change = 1;
 }
 void LEDhandle(){
     changing = 0;
