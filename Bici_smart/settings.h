@@ -9,6 +9,9 @@
 #endif
 MPU6050 mpu;
 
+#include <RTClib.h>
+RTC_DS3231 rtc;
+
 #define DEBUG 0
 
 // Pin definitions
@@ -44,6 +47,9 @@ unsigned long int noiseMillisCounter;
 unsigned long int millisCounter;
 byte check_light; 
 unsigned long int millisCheckpoint;
+
+// RTC
+//char date[10] = "hh:mm:ss";
 
 // LEDs
 #define MAX_FRONT_LED_POWER 200.0

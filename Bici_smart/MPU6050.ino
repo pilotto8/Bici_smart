@@ -8,6 +8,16 @@ void MPUsetUp(){
 	mpu.setMemoryStartAddress(0x06);
 	mpu.setMemoryBank(0, false, false);
 
+	DEBUG_PRINTLN(F("Setting slave 0 address to 0x7F..."));
+	mpu.setSlaveAddress(0, 0x7F);
+	DEBUG_PRINTLN(F("Disabling I2C Master mode..."));
+	mpu.setI2CMasterModeEnabled(false);
+	DEBUG_PRINTLN(F("Setting slave 0 address to 0x68 (self)..."));
+	mpu.setSlaveAddress(0, 0x68);
+	DEBUG_PRINTLN(F("Resetting I2C Master control..."));
+	mpu.resetI2CMaster();
+	delay(20);
+
 	mpu.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 	mpu.setRate(4); // 1khz / (1 + 4) = 200 Hz
     mpu.setDLPFMode(MPU6050_DLPF_BW_42);

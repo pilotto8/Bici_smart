@@ -1,10 +1,5 @@
 #include "settings.h"
 
-// ================================================================
-// ===               INTERRUPT DETECTION ROUTINE                ===
-// ================================================================
-
-volatile bool mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
 void hey()
 {
   phase = checking;
@@ -24,9 +19,19 @@ void setup()
   pinMode(INTERRUPT_PIN, INPUT);
   pinMode(FRONT_LED_PIN, OUTPUT);
   pinMode(REAR_LED_PIN, OUTPUT);
-  //pinMode(13, OUTPUT);
   pinMode(B0, INPUT_PULLUP);
   pinMode(B1, INPUT_PULLUP);
+
+  rtc.begin();
+  if (rtc.lostPower()) {
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
+  rtc.disable32K();
+  rtc.clearAlarm(1);
+  rtc.clearAlarm(2);
+  rtc.writeSqwPinMode(DS3231_OFF);
+  rtc.disableAlarm(2);
+
   MPUsetUp();
   mpu.setDMPEnabled(true);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), hey, RISING);
@@ -39,10 +44,15 @@ void setup()
     LED_mode[i] = EEPROM.read(i);
     Serial.println(LED_mode[i]);
   }
+  
 }
 
 void loop()
 {
+  char date[10] = "hh:mm:ss";
+  rtc.now().toString(date);
+  Serial.println(date);
+  delay(500);
   switch (phase){
     case sleeping:{
       if (phase != loaded_phase){
@@ -97,9 +107,6 @@ void loop()
     }
   }
 
-  if (millis() - millisCounter > 10 || change){
-      millisCounter = millis() / 10 * 10;
-      LEDhandle();
-  }
+  LEDhandle();
   buttons();
 }
