@@ -51,8 +51,9 @@ void MPUsetUp(){
 	mpu.resetFIFO();
 	mpu.getIntStatus();
 
-	//mpu.setWakeFrequency(1);
-    //mpu.setWakeCycleEnabled(2);
+	mpu.setStandbyXGyroEnabled(1);
+	mpu.setStandbyYGyroEnabled(1);
+	mpu.setStandbyZGyroEnabled(1);
 }
 
 void MPUsetInt(){
@@ -62,6 +63,8 @@ void MPUsetInt(){
     mpu.setMotionDetectionDuration(1);
     mpu.setMotionDetectionCounterDecrement(3);
     
+	mpu.setInterruptDrive(1);
+	mpu.setInterruptMode(1);
     mpu.setInterruptLatch(0);
     mpu.setInterruptLatchClear(0);
 

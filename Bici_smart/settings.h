@@ -49,6 +49,12 @@ byte check_light;
 unsigned long int millisCheckpoint;
 
 // RTC
+DateTime now;
+bool RTC_state;
+#define ON_HOUR 18
+#define OFF_HOUR 2
+DateTime alarm_ON (0,0,0,ON_HOUR,0,0);
+DateTime alarm_OFF (0,0,0,OFF_HOUR,0,0);
 //char date[10] = "hh:mm:ss";
 
 // LEDs
@@ -78,7 +84,7 @@ byte loaded_LED_mode[2];
 bool LED_state;
 
 bool changing;
-bool change;
+bool change = 1;
 
 // Light
 #define PH A0
@@ -89,6 +95,7 @@ int PH_value;
 int IR_value;
 
 // Buttons
-#define B0 3
-#define B1 4
+#define B0 8
+#define B1 9
+#define B2 10
 unsigned long int millisButtonPress;
