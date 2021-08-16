@@ -20,13 +20,10 @@ void buttons(){
                     if (phase != mooving){
                         phase = mooving;
                     }
-                    else{
+                    else {
                         setLEDstate(!LED_state);
                     }
                 }
-            }
-            else {
-                setLEDstate(1);
             }
             millisButtonPress = millis();
             stop = 1;

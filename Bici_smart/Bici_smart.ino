@@ -2,17 +2,23 @@
 
 void interrupt()
 {
+  Serial.print("Interrupt: ");
+  if (!digitalRead(B1)){
+    Serial.println("button");
+    return;
+  }
   if (RTC_state){
     if (mpu.getIntMotionStatus()){
       phase = checking;
+      Serial.println("MPU");
       return;
     }
   }
   if (rtc.alarmFired(1)){
     setAlarm(!RTC_state);
+    Serial.println("RTC");
     return;
   }
-  
 }
 
 
@@ -54,7 +60,6 @@ void setup()
   
   for (int i = 0; i < 2; i++){
     LED_mode[i] = EEPROM.read(i);
-    Serial.println(LED_mode[i]);
   }
   
   getTime();
@@ -63,10 +68,12 @@ void setup()
     loaded_LED_mode[1] = LED_mode[1];
     LED_state = 0;
     setAlarm(0);
+    Serial.println("RTC low");
   }
   else {
     LED_state = 1;
     setAlarm(1);
+    Serial.println("RTC high");
   }
   
 }
@@ -83,17 +90,20 @@ void loop()
         MPUsetUp();
         MPUsetInt();
         mpu.setIntMotionEnabled(1);
+
         Serial.println("Going to sleep...");
       }
       if (!changing){
         analogWrite(FRONT_LED_PIN, 0);
         analogWrite(REAR_LED_PIN, 0);
-        if (RTC_state && mpu.getSleepEnabled()){
+        /*if (RTC_state && mpu.getSleepEnabled()){
           mpu.setSleepEnabled(0);
+          Serial.println("MPU on");
         }
         else if (!mpu.getSleepEnabled()){
           mpu.setSleepEnabled(1);
-        }
+          Serial.println("MPU off");
+        }*/
         //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
         sleep_enable(); 
         sleep_mode();
@@ -101,11 +111,14 @@ void loop()
       }
       break;
     }
+
+
     case checking:{
       if (phase != loaded_phase){
         loaded_phase = phase;
         mpu.setIntMotionEnabled(0);
         millisCheckpoint = millis();
+
         Serial.println("Checking?");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > 500){ 
@@ -116,15 +129,21 @@ void loop()
       }
       break;
     }
+
+
     case mooving:{
       if (phase != loaded_phase){
         if (loaded_phase == sleeping){
-          mpu.setSleepEnabled(0);
+          if (mpu.getSleepEnabled()){
+            mpu.setSleepEnabled(0);
+            Serial.println("MPU on");
+          }
           mpu.setIntMotionEnabled(0);
         }
         loaded_phase = phase;
         setLEDstate(1);
         millisCheckpoint = millis();
+
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){
