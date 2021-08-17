@@ -1,27 +1,5 @@
 #include "settings.h"
 
-void interrupt()
-{
-  Serial.print("Interrupt: ");
-  if (!digitalRead(B1)){
-    Serial.println("button");
-    return;
-  }
-  if (RTC_state){
-    if (mpu.getIntMotionStatus()){
-      phase = checking;
-      Serial.println("MPU");
-      return;
-    }
-  }
-  if (rtc.alarmFired(1)){
-    setAlarm(!RTC_state);
-    Serial.println("RTC");
-    return;
-  }
-}
-
-
 void setup()
 {
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -31,7 +9,8 @@ void setup()
   Fastwire::setup(400, true);
 #endif
 
-  Serial.begin(115200);
+  Serial.begin(1000000);
+  Serial.println("\n----------------------------------------------------------------");
   pinMode(INTERRUPT_PIN, INPUT_PULLUP);
   pinMode(FRONT_LED_PIN, OUTPUT);
   pinMode(REAR_LED_PIN, OUTPUT);
@@ -51,11 +30,11 @@ void setup()
 
   MPUsetUp();
   mpu.setDMPEnabled(true);
-  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), interrupt, FALLING);
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-
   MPUsetInt();
   //mpu.setIntMotionEnabled(1);
+
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), interrupt, FALLING);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 
   
   for (int i = 0; i < 2; i++){
@@ -63,48 +42,53 @@ void setup()
   }
   
   getTime();
-  if (now.hour() < ON_HOUR && now.hour() > OFF_HOUR){
-    loaded_LED_mode[0] = LED_mode[0];
-    loaded_LED_mode[1] = LED_mode[1];
-    LED_state = 0;
+  if (now.hour() < ON_HOUR && now.hour() > OFF_HOUR) {
     setAlarm(0);
     Serial.println("RTC low");
   }
   else {
-    LED_state = 1;
     setAlarm(1);
     Serial.println("RTC high");
   }
+
+///// For debugging
+  //rtc.setAlarm1(now + TimeSpan(30), DS3231_A1_Hour);
   
 }
 
 void loop()
 {
-  LEDhandle();
   buttons();
+  checkInterrupt();
+  LEDhandle();
 
   switch (phase){
     case sleeping:{
-      if (phase != loaded_phase){
-        loaded_phase = phase;
-        MPUsetUp();
-        MPUsetInt();
-        mpu.setIntMotionEnabled(1);
-
-        Serial.println("Going to sleep...");
-      }
       if (!changing){
         analogWrite(FRONT_LED_PIN, 0);
         analogWrite(REAR_LED_PIN, 0);
-        /*if (RTC_state && mpu.getSleepEnabled()){
-          mpu.setSleepEnabled(0);
-          Serial.println("MPU on");
+
+        if (phase != loaded_phase){
+          loaded_phase = phase;
+          MPUsetUp();
+          MPUsetInt();
+          mpu.setIntMotionEnabled(1);
+          Serial.println("Going to sleep...");
+        }
+
+        
+        if (RTC_state){
+          if (mpu.getSleepEnabled()){
+            MPUsetUp();
+            MPUsetInt();
+            mpu.setIntMotionEnabled(1);
+            Serial.println("MPU on");
+          }
         }
         else if (!mpu.getSleepEnabled()){
           mpu.setSleepEnabled(1);
           Serial.println("MPU off");
-        }*/
-        //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+        }
         sleep_enable(); 
         sleep_mode();
         sleep_disable();
@@ -121,10 +105,10 @@ void loop()
 
         Serial.println("Checking?");
       }
-      if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > 500){ 
+      if (MPUgetNoise() < NOISE_TRESHOLD && millis() - millisCheckpoint > 1000){ 
         phase = sleeping;
       }
-      else if (millis() - millisCheckpoint > 1000){
+      else if (millis() - millisCheckpoint > 1500){
         phase = mooving;
       }
       break;

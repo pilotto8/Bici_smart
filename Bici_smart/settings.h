@@ -39,7 +39,7 @@ enum phases{
     checking,
     mooving
 };
-unsigned int phase = mooving;
+byte phase = mooving;
 byte loaded_phase;
 
 // Timer
@@ -88,14 +88,14 @@ bool change = 1;
 
 // Light
 #define PH A0
-#define IR A1
 #define LIGHT_SAMPLING_TIME 2
-#define PH_CONTRAST_TRESTHOLD 10
 int PH_value;
-int IR_value;
 
 // Buttons
 #define B0 8
 #define B1 9
 #define B2 10
 unsigned long int millisButtonPress;
+
+// Interrupt
+bool interrupt_fired;

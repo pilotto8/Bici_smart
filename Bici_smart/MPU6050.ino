@@ -51,9 +51,9 @@ void MPUsetUp(){
 	mpu.resetFIFO();
 	mpu.getIntStatus();
 
-	mpu.setStandbyXGyroEnabled(1);
+	/*mpu.setStandbyXGyroEnabled(1);
 	mpu.setStandbyYGyroEnabled(1);
-	mpu.setStandbyZGyroEnabled(1);
+	mpu.setStandbyZGyroEnabled(1);*/
 }
 
 void MPUsetInt(){
@@ -65,7 +65,7 @@ void MPUsetInt(){
     
 	mpu.setInterruptDrive(1);
 	mpu.setInterruptMode(1);
-    mpu.setInterruptLatch(0);
+    mpu.setInterruptLatch(1);
     mpu.setInterruptLatchClear(0);
 
 	#if DEBUG
