@@ -5,12 +5,12 @@ void buttons(){
             if (!stop){
                 if (LED_state){
                     if(!digitalRead(B0)){
-                        LED_mode[0] = (LED_mode[0] + 1) % 4;
+                        LED_mode[0] = (LED_mode[0] + 1) % LED_MODES;
                         Serial.print("Front: ");
                         Serial.println(LED_mode[0]);
                     }
                     if(!digitalRead(B2)){
-                        LED_mode[1] = (LED_mode[1] + 1) % 4;
+                        LED_mode[1] = (LED_mode[1] + 1) % LED_MODES;
                         Serial.print("Rear: ");
                         Serial.println(LED_mode[1]);
                     }

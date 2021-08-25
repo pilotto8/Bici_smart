@@ -19,7 +19,6 @@ RTC_DS3231 rtc;
 #define FRONT_LED_PIN 5
 #define REAR_LED_PIN 6
 
-
 // MPU values
 #define NOISE_LENGTH 20
 #define NOISE_TRESHOLD 10
@@ -31,7 +30,6 @@ unsigned int noise[NOISE_LENGTH];
 unsigned int max_noise;
 float average_noise;
 byte noise_index;
-
 
 // Phases
 enum phases{
@@ -58,22 +56,21 @@ DateTime alarm_OFF (0,0,0,OFF_HOUR,0,0);
 //char date[10] = "hh:mm:ss";
 
 // LEDs
-#define MAX_FRONT_LED_POWER 200.0
-#define MAX_REAR_LED_POWER 1024.0
+#define MAX_FRONT_LED_POWER 255.0
+#define MAX_REAR_LED_POWER 255.0
 #define LED_TRANSITION_TIME 100.0
+#define LED_MODES 4
 const float FRONT_LED_COEFF =  MAX_FRONT_LED_POWER / LED_TRANSITION_TIME;
 const float REAR_LED_COEFF = MAX_REAR_LED_POWER / LED_TRANSITION_TIME;
-#if FRONT_LED_COEFF > REAR_LED_COEFF
-#define MIN_STEP REAR_LED_COEFF
-#else
-#define MIN_STEP FRONT_LED_COEFF
-#endif
+
+float MIN_STEP[2] = {FRONT_LED_COEFF, REAR_LED_COEFF};
+
 
 float LED_power[2];
 float LED_power_target[2];
 unsigned int LED_blink[2];
 unsigned int blink[2];
-const float mode_map[4][4] = {
+const float mode_map[4][LED_MODES] = {
     {0.0, MAX_FRONT_LED_POWER, MAX_FRONT_LED_POWER / 10.0, MAX_FRONT_LED_POWER},
     {0.0, 0.0, 0.0, 25.0},
     {0.0, MAX_REAR_LED_POWER, MAX_REAR_LED_POWER / 10.0, MAX_REAR_LED_POWER},
