@@ -17,6 +17,8 @@ void setup()
   pinMode(B0, INPUT_PULLUP);
   pinMode(B1, INPUT_PULLUP);
   pinMode(B2, INPUT_PULLUP);
+  //pinMode(13, OUTPUT);
+  //digitalWrite(13, LOW);
 
   rtc.begin();
   if (rtc.lostPower()) {

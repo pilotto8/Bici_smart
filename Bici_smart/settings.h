@@ -14,10 +14,6 @@ RTC_DS3231 rtc;
 
 #define DEBUG 0
 
-// Pin definitions
-#define INTERRUPT_PIN 2
-#define FRONT_LED_PIN 5
-#define REAR_LED_PIN 6
 
 // MPU values
 #define NOISE_LENGTH 20
@@ -56,6 +52,8 @@ DateTime alarm_OFF (0,0,0,OFF_HOUR,0,0);
 //char date[10] = "hh:mm:ss";
 
 // LEDs
+#define FRONT_LED_PIN 5
+#define REAR_LED_PIN 6
 #define MAX_FRONT_LED_POWER 255.0
 #define MAX_REAR_LED_POWER 255.0
 #define LED_TRANSITION_TIME 100.0
@@ -95,4 +93,5 @@ int PH_value;
 unsigned long int millisButtonPress;
 
 // Interrupt
+#define INTERRUPT_PIN 2
 bool interrupt_fired;
