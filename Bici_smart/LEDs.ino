@@ -33,9 +33,9 @@ void LEDhandle(){
             if (abs(LED_power_target[i] - LED_power[i]) >= MIN_STEP[i]){
                 changing = 1;
                 LED_power[i] += (FRONT_LED_COEFF * !i + REAR_LED_COEFF * i) * ((LED_power_target[i] - LED_power[i] > 0.0) ? 1 : -1);
-                Serial.print(LED_power_target[i]);
+                /*Serial.print(LED_power_target[i]);
                 Serial.print(", ");
-                Serial.println((int)LED_power[i]);
+                Serial.println((int)LED_power[i]);*/
                 if (LED_blink[i] == 0.0){
                     analogWrite(FRONT_LED_PIN + i, (int)LED_power[i]);
                 }

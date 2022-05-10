@@ -22,10 +22,12 @@ void buttons(){
                     }
                     else {
                         setLEDstate(!LED_state);
+                        phase = sleeping;
                     }
                 }
             }
             millisButtonPress = millis();
+            millisCheckpoint = millisButtonPress;
             stop = 1;
         }
     }

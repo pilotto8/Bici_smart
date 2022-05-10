@@ -9,7 +9,7 @@ void setup()
   Fastwire::setup(400, true);
 #endif
 
-  Serial.begin(1000000);
+  Serial.begin(9600);
   Serial.println("\n----------------------------------------------------------------");
   pinMode(INTERRUPT_PIN, INPUT_PULLUP);
   pinMode(FRONT_LED_PIN, OUTPUT);
@@ -17,8 +17,8 @@ void setup()
   pinMode(B0, INPUT_PULLUP);
   pinMode(B1, INPUT_PULLUP);
   pinMode(B2, INPUT_PULLUP);
-  //pinMode(13, OUTPUT);
-  //digitalWrite(13, LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  
 
   rtc.begin();
   if (rtc.lostPower()) {
@@ -133,7 +133,7 @@ void loop()
         Serial.println("Mooving!");
       }
       if (MPUgetNoise() < NOISE_TRESHOLD){
-        if (millis() - millisCheckpoint > 10000){
+        if (millis() - millisCheckpoint > 3600 * 1000){
           setLEDstate(0);
           phase = sleeping;
         }

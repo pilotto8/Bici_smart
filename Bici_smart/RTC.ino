@@ -9,5 +9,5 @@ void setAlarm(bool state){
     else{
         rtc.setAlarm1(alarm_OFF, DS3231_A1_Hour);
     }
-    RTC_state = state;
+    RTC_state = 1; //state;
 }
